@@ -1,5 +1,5 @@
-#ifndef NUMERICAL_H
-#define NUMERICAL_H
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -9,11 +9,11 @@ extern "C"
 {
 #endif
 
-#ifndef NUMDEF
-#ifdef NUMERICAL_STATIC
-#define NUMDEF static
+#ifndef GEOMDEF
+#ifdef GEOMETRY_STATIC
+#define GEOMDEF static
 #else
-#define NUMDEF extern
+#define GEOMDEF extern
 #endif
 #endif
 
@@ -24,38 +24,38 @@ extern "C"
         double z;
     } vec3_t;
 
-    NUMDEF bool assert_eq(double a, double b);
+    GEOMDEF bool assert_eq(double a, double b);
 
-    NUMDEF vec3_t vec3_subtract(vec3_t *origin, vec3_t *end);
-    NUMDEF double max(double a, double b);
-    NUMDEF double min(double a, double b);
-    NUMDEF double vec3_dot(vec3_t *a, vec3_t *b);
-    NUMDEF vec3_t vec3_cross(vec3_t *a, vec3_t *b);
-    NUMDEF double vec3_l2_norm(vec3_t *a);
-    NUMDEF void vec3_normalise_in_place(vec3_t *a);
-    NUMDEF void vec3_invert_in_place(vec3_t *a);
-    NUMDEF void vec3_coord_trans_xz_in_place(vec3_t *a, double radian);
-    NUMDEF void vec3_coord_trans_xy_in_place(vec3_t *a, double radian);
+    GEOMDEF vec3_t vec3_subtract(vec3_t *origin, vec3_t *end);
+    GEOMDEF double max(double a, double b);
+    GEOMDEF double min(double a, double b);
+    GEOMDEF double vec3_dot(vec3_t *a, vec3_t *b);
+    GEOMDEF vec3_t vec3_cross(vec3_t *a, vec3_t *b);
+    GEOMDEF double vec3_l2_norm(vec3_t *a);
+    GEOMDEF void vec3_normalise_in_place(vec3_t *a);
+    GEOMDEF void vec3_invert_in_place(vec3_t *a);
+    GEOMDEF void vec3_coord_trans_xz_in_place(vec3_t *a, double radian);
+    GEOMDEF void vec3_coord_trans_xy_in_place(vec3_t *a, double radian);
 
-    NUMDEF bool is_simple_polygon(vec3_t *vertices, size_t nvtx);
+    GEOMDEF bool is_simple_polygon(vec3_t *vertices, size_t nvtx);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // NUMERICAL_H
+#endif // GEOMETRY_H
 
-#ifdef NUMERICAL_IMPLEMENTATION
+#ifdef GEOMETRY_IMPLEMENTATION
 
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 
-#define NUM_EPSILON 1.0e-9
+#define GEOM_EPSILON 1.0e-9
 
 bool assert_eq(double a, double b)
 {
-    return fabs(a - b) < NUM_EPSILON;
+    return fabs(a - b) < GEOM_EPSILON;
 }
 
 double max(double a, double b)
@@ -68,7 +68,7 @@ double min(double a, double b)
     return (a < b) ? a : b;
 }
 
-NUMDEF vec3_t vec3_subtract(vec3_t *origin, vec3_t *end)
+GEOMDEF vec3_t vec3_subtract(vec3_t *origin, vec3_t *end)
 {
     vec3_t a = {
         .x = end->x - origin->x,
@@ -79,12 +79,12 @@ NUMDEF vec3_t vec3_subtract(vec3_t *origin, vec3_t *end)
     return a;
 }
 
-NUMDEF double vec3_dot(vec3_t *a, vec3_t *b)
+GEOMDEF double vec3_dot(vec3_t *a, vec3_t *b)
 {
     return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
-NUMDEF vec3_t vec3_cross(vec3_t *a, vec3_t *b)
+GEOMDEF vec3_t vec3_cross(vec3_t *a, vec3_t *b)
 {
     vec3_t prod = {
         .x = a->y * b->z - a->z * b->y,
@@ -95,12 +95,12 @@ NUMDEF vec3_t vec3_cross(vec3_t *a, vec3_t *b)
     return prod;
 }
 
-NUMDEF double vec3_l2_norm(vec3_t *a)
+GEOMDEF double vec3_l2_norm(vec3_t *a)
 {
     return sqrt(a->x * a->x + a->y * a->y + a->z * a->z);
 }
 
-NUMDEF void vec3_normalise_in_place(vec3_t *a)
+GEOMDEF void vec3_normalise_in_place(vec3_t *a)
 {
     double norm = vec3_l2_norm(a);
 
@@ -109,14 +109,14 @@ NUMDEF void vec3_normalise_in_place(vec3_t *a)
     a->z /= norm;
 }
 
-NUMDEF void vec3_invert_in_place(vec3_t *a)
+GEOMDEF void vec3_invert_in_place(vec3_t *a)
 {
     a->x *= -1.0;
     a->y *= -1.0;
     a->z *= -1.0;
 }
 
-NUMDEF void vec3_coord_trans_xz_in_place(vec3_t *a, double radian)
+GEOMDEF void vec3_coord_trans_xz_in_place(vec3_t *a, double radian)
 {
     double x = a->x;
     double z = a->z;
@@ -125,7 +125,7 @@ NUMDEF void vec3_coord_trans_xz_in_place(vec3_t *a, double radian)
     a->z = x * sin(radian) + z * cos(radian);
 }
 
-NUMDEF void vec3_coord_trans_xy_in_place(vec3_t *a, double radian)
+GEOMDEF void vec3_coord_trans_xy_in_place(vec3_t *a, double radian)
 {
     double x = a->x;
     double y = a->y;
@@ -148,7 +148,7 @@ static bool is_coplanar(vec3_t *vertices, size_t nvtx)
     {
         vec3_t diff = vec3_subtract(&vertices[i], &p0);
 
-        if (vec3_l2_norm(&diff) > NUM_EPSILON)
+        if (vec3_l2_norm(&diff) > GEOM_EPSILON)
         {
             p1 = vertices[i];
             found_p1 = true;
@@ -172,7 +172,7 @@ static bool is_coplanar(vec3_t *vertices, size_t nvtx)
         vec3_t v_tmp = vec3_subtract(&vertices[j], &p0);
         vec3_t cross = vec3_cross(&u, &v_tmp);
 
-        if (vec3_l2_norm(&cross) > NUM_EPSILON)
+        if (vec3_l2_norm(&cross) > GEOM_EPSILON)
         {
             p2 = vertices[j];
             found_p2 = true;
@@ -196,7 +196,7 @@ static bool is_coplanar(vec3_t *vertices, size_t nvtx)
         vec3_t diff = vec3_subtract(&vertices[k], &p0);
         double dist = vec3_dot(&diff, &normal);
 
-        if (fabs(dist) > NUM_EPSILON)
+        if (fabs(dist) > GEOM_EPSILON)
         {
             fprintf(stderr, "%-8sVertex %zu deviates from the plane\n", "[ERROR]", k);
             return false;
@@ -225,7 +225,7 @@ static void vertices_proj_to_2d_in_place(vec3_t *vertices, size_t nvtx)
         vec3_t v_cand = vec3_subtract(&vertices[i], &p0);
         vec3_t prod = vec3_cross(&u, &v_cand);
 
-        if (vec3_l2_norm(&prod) > NUM_EPSILON)
+        if (vec3_l2_norm(&prod) > GEOM_EPSILON)
         {
             normal = prod;
             break;
@@ -251,7 +251,7 @@ static int vertices_orientation(vec3_t *a, vec3_t *b, vec3_t *c)
     double res = (b->y - a->y) * (c->x - b->x) - (b->x - a->x) * (c->y - b->y);
 
     // return 0 if collinear, 1 if clockwise, -1 if counterclockwise
-    if (fabs(res) < NUM_EPSILON)
+    if (fabs(res) < GEOM_EPSILON)
         return 0;
 
     return (res > 0) ? 1 : -1;
@@ -289,7 +289,7 @@ static bool is_intersect(vec3_t *p1, vec3_t *p2, vec3_t *q1, vec3_t *q2)
     return false;
 }
 
-NUMDEF bool is_simple_polygon(vec3_t *vertices, size_t nvtx)
+GEOMDEF bool is_simple_polygon(vec3_t *vertices, size_t nvtx)
 {
     // check if enough vertices to form a polygon
     if (nvtx < 3)
@@ -335,4 +335,4 @@ NUMDEF bool is_simple_polygon(vec3_t *vertices, size_t nvtx)
     return true;
 }
 
-#endif // NUMERICAL_IMPLEMENTATION
+#endif // GEOMETRY_IMPLEMENTATION
